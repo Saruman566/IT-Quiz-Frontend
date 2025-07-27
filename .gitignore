@@ -1,0 +1,45 @@
+# Build-Ordner
+bin/
+obj/
+
+# User-spezifische Dateien
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider/JetBrains
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Umgebungsdateien
+.env
+
+# Paket-Manager
+packages/
+*.nupkg
+
+# Backup-Dateien
+*.bak
+*.tmp
+*.swp
+
+# DLLs/EXEs
+*.exe
+*.dll
+*.pdb
+
+# Publish-Ordner
+publish/
+wwwroot/
+
+# Systemdateien
+Thumbs.db
+.DS_Store
+
+node_modules/

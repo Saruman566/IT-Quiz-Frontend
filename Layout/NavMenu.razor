@@ -1,0 +1,77 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <div class="navbar-brand"><h1> IT-Quiz</h1> </div>
+       
+    </div>
+</div>
+
+<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link">
+               <h5 class="title-font">Themen</h5> 
+               <span class="bi2 bi-arrow-down-circle-fill" aria-hidden="true"></span> 
+            </NavLink>
+        </div>
+
+        @foreach (var item in NavItems)
+        {
+            <div class="nav-item px-3" @onclick="@(() => HandleClick(item))">
+                <NavLink class="nav-link" href="@item.Route">
+                    <span class="bi3 @item.IconClass" aria-hidden="true"></span>
+                    <h9 class="undertitle-font">@item.Title</h9>
+                </NavLink>
+            </div>
+        }
+    </nav>
+</div>
+
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    @code {
+    class NavItem
+    {
+        public string IconClass { get; set; }
+        public string Route { get; set; }
+        public string Title { get; set; }
+    }
+
+    List<NavItem> NavItems = new()
+    {    
+    new NavItem { IconClass = "bi-hdd-fill", Route = "it_systeme", Title = "IT-Systeme" },
+    new NavItem { IconClass = "bi-lock-fill", Route = "it_sicherheit", Title = "IT-Sicherheit" },    
+    new NavItem { IconClass = "bi-code-slash", Route = "programmieren", Title = "Programmieren" },   
+    new NavItem { IconClass = "bi-database-fill", Route = "datenbanken", Title = "Datenbanken" },
+    new NavItem { IconClass = "bi-terminal-fill", Route = "linux", Title = "Linux" },
+    new NavItem { IconClass = "bi-ethernet", Route = "tcpip", Title = "TCP/IP" },
+    new NavItem { IconClass = "bi-diagram-3-fill", Route = "ipv4", Title = "IPv4" },
+    new NavItem { IconClass = "bi-diagram-3", Route = "ipv6", Title = "IPv6" },
+    new NavItem { IconClass = "bi-signpost-split-fill", Route = "routing", Title = "Routing" },
+    new NavItem { IconClass = "bi-shield-lock-fill", Route = "firewall", Title = "Firewall" },
+    new NavItem { IconClass = "bi-cpu-fill", Route = "cyberphysischesysteme", Title = "Cyberphy. Systeme" },
+    new NavItem { IconClass = "bi-kanban-fill", Route = "projektmanagement", Title = "Projektmanagement" },  
+    new NavItem { IconClass = "bi-journal-bookmark-fill", Route = "organisationslehre", Title = "Organisationslehre" },
+    new NavItem { IconClass = "bi-building-fill", Route = "rechtsformen", Title = "Rechtsformen" },
+    new NavItem { IconClass = "bi-circle-fill", Route = "arbeitsrecht", Title = "Arbeitsrecht" }, 
+    new NavItem { IconClass = "bi-calculator-fill", Route = "kalkulationen", Title = "Kalkulationen" },
+    new NavItem { IconClass = "bi-megaphone-fill", Route = "marketing", Title = "Marketing" },
+    new NavItem { IconClass = "bi-globe2", Route = "wiso", Title = "Wirtschaft & Soziales" }
+    };
+
+    void HandleClick(NavItem item)
+    {
+        // Hier machst du irgendwas — z. B. Zustand ändern oder Daten laden.
+        Console.WriteLine($"Item '{item.Title}' wurde angeklickt.");
+    }
+
+}
+}
