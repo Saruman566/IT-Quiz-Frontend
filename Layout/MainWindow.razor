@@ -1,37 +1,131 @@
+@using System.Text.Json
+@inject NavigationManager Navigation
+@implements IDisposable
+@inject HttpClient Http
+
 <div class="main-window-container"> 
-  <div class="theme-container">
-    <h1>Cyberphysische Systeme</h1>
+  <div class="theme-container">    
+    <h1>@Thema</h1>    
   </div>
-    <div class="quest-container">
-        <div class="quest-style-container"></div>
-    </div>
-      <div class="answers-container"> 
 
-        <div class="answerfields"> 
-            <div class="answers">
-                <div class="answers-inner answers-one"></div>
-                </div> 
-            <div class="answers">
-                <div class="answers-inner answers-two"></div> 
-                </div>
+ 
+    <button class="arrow-button-left" >
+      <i class="bi bi-arrow-left-circle-fill"></i>
+    </button>
+      <div class="quest-container">    
+        <div class="quest-style-container">
+          <div class="quest-container-text">
+            <h1 class="quest-style">Frage:</h1>
+            <h1 class="quest-style2">@AktuelleFrage?.frage</h1>
+          </div>          
         </div>
-
-        <div class="answerfields"> 
-            <div class="answers">
-                <div class="answers-inner answers-three"></div>
-                </div>
-            <div class="answers">
-                <div class="answers-inner answers-four"></div>
-                </div>  
-        </div>
-
-
-         </div>       
       </div>
+    <button class="arrow-button-right" >
+      <i class="bi bi-arrow-right-circle-fill"></i>
+    </button>
+  
 
+  <div class="answers-container"> 
+    <div class="answerfields"> 
+      <div class="answers">
+        <div class="answers-inner answers-one">@AktuelleFrage?.antwort_eins</div>
+      </div> 
+      <div class="answers">
+        <div class="answers-inner answers-two">@AktuelleFrage?.antwort_zwei</div> 
+      </div>
+    </div>
 
+    <div class="answerfields"> 
+      <div class="answers">
+        <div class="answers-inner answers-three">@AktuelleFrage?.antwort_drei</div>
+      </div>
+      <div class="answers">
+        <div class="answers-inner answers-four">@AktuelleFrage?.antwort_vier</div>
+      </div>  
+    </div>
+  </div>
+</div>
 
+@code {
+    public string Thema { get; set; } = "Standard";
+    public QuizFrage? AktuelleFrage { get; set; }
 
-    @code {
+    private async Task LadeThemenDatenAsync(string gebiet)
+    {
+        try
+        {
+            string cleanedGebiet = gebiet.ToLower().Replace(" ", "_");
+            string endpoint = $"api/Quiz?gebiet={Uri.EscapeDataString(cleanedGebiet)}";
 
+            var response = await Http.GetAsync(endpoint);
+
+            if (response.IsSuccessStatusCode)
+            {
+                string content = await response.Content.ReadAsStringAsync();
+                var fragenListe = JsonSerializer.Deserialize<List<QuizFrage>>(content);
+
+                if (fragenListe != null && fragenListe.Count > 0)
+                {
+                    AktuelleFrage = fragenListe[0];
+                    StateHasChanged();
+                }
+                else
+                {
+                    Console.WriteLine("Keine Fragen gefunden.");
+                }
+            }
+            else
+            {
+                Console.WriteLine($"Fehler vom Server: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler beim Abrufen: {ex.Message}");
+        }
     }
+
+    protected override void OnInitialized()
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        SetThemaFromUri(Navigation.Uri);
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        SetThemaFromUri(e.Location);
+        StateHasChanged();
+    }
+
+    private void SetThemaFromUri(string uri)
+    {
+        var path = new Uri(uri).AbsolutePath.Trim('/');
+
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            Thema = "Startseite";
+        }
+        else
+        {
+            Thema = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(
+                path.Replace("_", " ").ToLower());
+
+            _ = LadeThemenDatenAsync(Thema);
+        }
+    }
+
+    public void Dispose()
+    {
+        Navigation.LocationChanged -= OnLocationChanged;
+    }
+
+    public class QuizFrage
+    {
+        public string frage { get; set; } = "";
+        public string antwort_eins { get; set; } = "";
+        public string antwort_zwei { get; set; } = "";
+        public string antwort_drei { get; set; } = "";
+        public string antwort_vier { get; set; } = "";
+        public string richtige_antwort { get; set; } = "";
+    }
+}
