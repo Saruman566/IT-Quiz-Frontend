@@ -4,3 +4,4 @@ COPY ./publish ./
 ENV ASPNETCORE_URLS=http://0.0.0.0:5073
 EXPOSE 5073
 ENTRYPOINT ["dotnet", "ITQuizFrontend.dll"]
+
