@@ -12,27 +12,16 @@ services:
       - itquiz-network
 
   itquizfrontend:
-    image: mithrandier38/monitorsharing:itquizfrontend
+    build:
+      context: .
+      dockerfile: Dockerfile
     platform: linux/amd64
     container_name: itquiz_frontend_1.0
-    expose:
-      - "5073"
-    networks:
-      - itquiz-network
-
-  nginx:
-    image: nginx:alpine
-    container_name: nginx-proxy
     ports:
-      - "80:80"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - itquizfrontend
+      - "3001:80"
     networks:
       - itquiz-network
 
 networks:
   itquiz-network:
     driver: bridge
-

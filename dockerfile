@@ -1,7 +1,10 @@
-FROM mcr.microsoft.com/dotnet/aspnet:9.0
-WORKDIR /app
-COPY ./publish ./
-ENV ASPNETCORE_URLS=http://0.0.0.0:5073
-EXPOSE 5073
-ENTRYPOINT ["dotnet", "ITQuizFrontend.dll"]
+# Dockerfile
+FROM nginx:alpine
 
+# Statische Blazor-Dateien kopieren (nach dotnet publish)
+COPY ./publish/ /usr/share/nginx/html/
+
+# Optional: eigene nginx.conf für SPA-Routing
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
