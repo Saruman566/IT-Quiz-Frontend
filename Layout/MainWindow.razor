@@ -87,34 +87,47 @@
         }
     }
 
-    protected override void OnInitialized()
+    private async Task InitLadeFragenAsync(string uri)
+{
+    SetThemaFromUri(uri, out var gebiet);
+    await LadeThemenDatenAsync(gebiet);
+}
+
+
+    protected override async Task OnInitializedAsync()
+{
+    Navigation.LocationChanged += OnLocationChanged;
+
+    var uri = Navigation.Uri;
+    await InitLadeFragenAsync(uri);
+}
+
+
+    
+    private void SetThemaFromUri(string uri, out string gebiet)
+{
+    var path = new Uri(uri).AbsolutePath.Trim('/');
+    if (string.IsNullOrWhiteSpace(path))
     {
-        Navigation.LocationChanged += OnLocationChanged;
-        SetThemaFromUri(Navigation.Uri);
+        Thema = "Startseite";
+        gebiet = Thema;
     }
-
-    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    else
     {
-        SetThemaFromUri(e.Location);
-        StateHasChanged();
+        Thema = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(
+            path.Replace("_", " ").ToLower());
+        gebiet = Thema;
     }
+}
 
-    private void SetThemaFromUri(string uri)
-    {
-        var path = new Uri(uri).AbsolutePath.Trim('/');
+    private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+{
+    await InitLadeFragenAsync(e.Location);
+    StateHasChanged();
+}
 
-        if (string.IsNullOrWhiteSpace(path))
-        {
-            Thema = "Startseite";
-        }
-        else
-        {
-            Thema = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(
-                path.Replace("_", " ").ToLower());
 
-            _ = LadeThemenDatenAsync(Thema);
-        }
-    }
+
 
     public void Dispose()
     {
