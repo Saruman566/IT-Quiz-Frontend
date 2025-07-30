@@ -3,15 +3,23 @@
 @implements IDisposable
 @inject HttpClient Http
 
-<div class="main-window-container"> 
-  <div class="theme-container">    
-    <h1>@Thema</h1>    
-  </div>
+@if (!IstGeladen)
+{
+    <div class="ladeanzeige">
+        <p>⏳ Fragen werden geladen...</p>
+    </div>
+}
+else
+{
+    <div class="main-window-container"> 
+      <div class="theme-container">    
+        <h1>@Thema</h1>    
+      </div>
 
- 
-    <button class="arrow-button-left" @onclick="LastQuestion" disabled="@(QuestCounter == 0)">
-      <i class="bi bi-arrow-left-circle-fill"></i>
-    </button>
+      <button class="arrow-button-left" @onclick="LastQuestion" disabled="@(QuestCounter == 0)">
+        <i class="bi bi-arrow-left-circle-fill"></i>
+      </button>
+
       <div class="quest-container">    
         <div class="quest-style-container">
           <div class="quest-container-text">
@@ -20,39 +28,43 @@
           </div>          
         </div>
       </div>
-    <button class="arrow-button-right" @onclick="NextQuestion" disabled="@(QuestCounter == FragenListe.Count - 1)">
-      <i class="bi bi-arrow-right-circle-fill"></i>
-    </button>
-  
 
-  <div class="answers-container"> 
-    <div class="answerfields"> 
-      <div class="answers">
-        <div class="answers-inner answers-one">@AktuelleFrage?.antwort_eins</div>
-      </div> 
-      <div class="answers">
-        <div class="answers-inner answers-two">@AktuelleFrage?.antwort_zwei</div> 
+      <button class="arrow-button-right" @onclick="NextQuestion" disabled="@(QuestCounter == FragenListe.Count - 1)">
+        <i class="bi bi-arrow-right-circle-fill"></i>
+      </button>
+
+      <div class="answers-container"> 
+        <div class="answerfields"> 
+          <div class="answers">
+            <div class="answers-inner answers-one">@AktuelleFrage?.antwort_eins</div>
+          </div> 
+          <div class="answers">
+            <div class="answers-inner answers-two">@AktuelleFrage?.antwort_zwei</div> 
+          </div>
+        </div>
+
+        <div class="answerfields"> 
+          <div class="answers">
+            <div class="answers-inner answers-three">@AktuelleFrage?.antwort_drei</div>
+          </div>
+          <div class="answers">
+            <div class="answers-inner answers-four">@AktuelleFrage?.antwort_vier</div>
+          </div>  
+        </div>
       </div>
     </div>
-
-    <div class="answerfields"> 
-      <div class="answers">
-        <div class="answers-inner answers-three">@AktuelleFrage?.antwort_drei</div>
-      </div>
-      <div class="answers">
-        <div class="answers-inner answers-four">@AktuelleFrage?.antwort_vier</div>
-      </div>  
-    </div>
-  </div>
-</div>
+}
 
 @code {
     public string Thema { get; set; } = "Standard";
     public QuizFrage? AktuelleFrage { get; set; }
     public List<QuizFrage> FragenListe { get; set; } = new();
     public int QuestCounter = 0;
+    public bool IstGeladen { get; set; } = false;
+
     private async Task LadeThemenDatenAsync(string gebiet)
     {
+        IstGeladen = false;
         try
         {
             string cleanedGebiet = gebiet.ToLower().Replace(" ", "_");
@@ -69,10 +81,11 @@
                 {
                     FragenListe = fragenListe;
                     AktuelleFrage = FragenListe[0];
-                    StateHasChanged();
                 }
                 else
                 {
+                    FragenListe = new();
+                    AktuelleFrage = null;
                     Console.WriteLine("Keine Fragen gefunden.");
                 }
             }
@@ -85,48 +98,48 @@
         {
             Console.WriteLine($"Fehler beim Abrufen: {ex.Message}");
         }
+
+        IstGeladen = true;
+        StateHasChanged();
     }
 
     private async Task InitLadeFragenAsync(string uri)
-{
-    SetThemaFromUri(uri, out var gebiet);
-    await LadeThemenDatenAsync(gebiet);
-}
-
+    {
+        SetThemaFromUri(uri, out var gebiet);
+        await LadeThemenDatenAsync(gebiet);
+    }
 
     protected override async Task OnInitializedAsync()
-{
-    Navigation.LocationChanged += OnLocationChanged;
+    {
+        Navigation.LocationChanged += OnLocationChanged;
+        var uri = Navigation.Uri;
+        await InitLadeFragenAsync(uri);
+    }
 
-    var uri = Navigation.Uri;
-    await InitLadeFragenAsync(uri);
-}
-
-
-    
     private void SetThemaFromUri(string uri, out string gebiet)
-{
-    var path = new Uri(uri).AbsolutePath.Trim('/');
-    if (string.IsNullOrWhiteSpace(path))
     {
-        Thema = "Startseite";
-        gebiet = Thema;
+        var path = new Uri(uri).AbsolutePath.Trim('/');
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            Thema = "Startseite";
+            gebiet = Thema;
+        }
+        else
+        {
+            Thema = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(
+                path.Replace("_", " ").ToLower());
+            gebiet = Thema;
+        }
     }
-    else
-    {
-        Thema = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(
-            path.Replace("_", " ").ToLower());
-        gebiet = Thema;
-    }
-}
 
-    private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
 {
-    await InitLadeFragenAsync(e.Location);
-    StateHasChanged();
+    _ = InvokeAsync(async () =>
+    {
+        await InitLadeFragenAsync(e.Location);
+        StateHasChanged();
+    });
 }
-
-
 
 
     public void Dispose()
@@ -134,28 +147,26 @@
         Navigation.LocationChanged -= OnLocationChanged;
     }
 
-   public void NextQuestion()
+    public void NextQuestion()
     {
-      if (FragenListe != null && QuestCounter < FragenListe.Count - 1)
-      {
-          QuestCounter++;
-          AktuelleFrage = FragenListe[QuestCounter];
-          StateHasChanged();
-
-          Console.WriteLine($"Aktuelle Frage: {QuestCounter} / {FragenListe.Count}");
-      }
+        if (FragenListe != null && QuestCounter < FragenListe.Count - 1)
+        {
+            QuestCounter++;
+            AktuelleFrage = FragenListe[QuestCounter];
+            StateHasChanged();
+            Console.WriteLine($"Aktuelle Frage: {QuestCounter} / {FragenListe.Count}");
+        }
     }
 
     public void LastQuestion()
     {
-      if (FragenListe != null && QuestCounter > 0)
-      {
-          QuestCounter--;
-          AktuelleFrage = FragenListe[QuestCounter];
-          StateHasChanged();
-      }
+        if (FragenListe != null && QuestCounter > 0)
+        {
+            QuestCounter--;
+            AktuelleFrage = FragenListe[QuestCounter];
+            StateHasChanged();
+        }
     }
-
 
     public class QuizFrage
     {
