@@ -24,7 +24,9 @@ else
         <div class="quest-style-container">
           <div class="quest-container-text">
             <h1 class="quest-style">Frage:</h1>
-            <h1 class="quest-style2">@AktuelleFrage?.frage</h1>
+            <h1 class="quest-style2">@((AktuelleFrage?.frage) ?? "Bitte wählen Sie ein Thema aus dem linken Menü")</h1>
+
+
           </div>          
         </div>
       </div>
@@ -68,7 +70,7 @@ else
         try
         {
             string cleanedGebiet = gebiet.ToLower().Replace(" ", "_");
-            string endpoint = $"api/Quiz?gebiet={Uri.EscapeDataString(cleanedGebiet)}";
+            string endpoint = $"/Quiz?gebiet={Uri.EscapeDataString(cleanedGebiet)}";
 
             var response = await Http.GetAsync(endpoint);
 
