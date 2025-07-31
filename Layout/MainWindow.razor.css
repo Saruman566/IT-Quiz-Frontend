@@ -117,6 +117,20 @@
     font-size: 1.5rem;
 }
 
+.answers-inner.button-correct {
+    background-color: greenyellow !important;
+    background-image: none !important;
+    transition: background-color 0.3s ease;
+    color: black;
+}
+
+.answers-inner.button-wrong {
+    background-color: red!important;
+    background-image: none !important;
+    transition: background-color 0.3s ease;
+}
+
+
 .arrow-button-left {
     color: white; font-size: 4rem; margin-top: 13.5rem; margin-left: -90rem;
     background-color: transparent;
@@ -148,4 +162,5 @@
   color: #3a0647;
   background-color: white;
 }
+
 

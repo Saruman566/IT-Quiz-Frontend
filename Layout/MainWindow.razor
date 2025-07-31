@@ -25,8 +25,6 @@ else
           <div class="quest-container-text">
             <h1 class="quest-style">Frage:</h1>
             <h1 class="quest-style2">@((AktuelleFrage?.frage) ?? "Bitte wählen Sie ein Thema aus dem linken Menü")</h1>
-
-
           </div>          
         </div>
       </div>
@@ -38,19 +36,32 @@ else
       <div class="answers-container"> 
         <div class="answerfields"> 
           <div class="answers">
-            <div class="answers-inner answers-one">@AktuelleFrage?.antwort_eins</div>
+            <button class="answers-inner answers-one @GetCssClass(AktuelleFrage?.antwort_eins)"            
+              @onclick="() => AntwortAuswaehlen(AktuelleFrage?.antwort_eins ?? string.Empty)">
+              @AktuelleFrage?.antwort_eins
+            </button>
           </div> 
+
           <div class="answers">
-            <div class="answers-inner answers-two">@AktuelleFrage?.antwort_zwei</div> 
+            <button class="answers-inner answers-two @GetCssClass(AktuelleFrage?.antwort_zwei)"
+        @onclick="() => AntwortAuswaehlen(AktuelleFrage?.antwort_zwei)">
+    @AktuelleFrage?.antwort_zwei
+</button>
           </div>
         </div>
 
         <div class="answerfields"> 
           <div class="answers">
-            <div class="answers-inner answers-three">@AktuelleFrage?.antwort_drei</div>
+            <button class="answers-inner answers-three @GetCssClass(AktuelleFrage?.antwort_drei)"
+        @onclick="() => AntwortAuswaehlen(AktuelleFrage?.antwort_drei)">
+    @AktuelleFrage?.antwort_drei
+</button>
           </div>
           <div class="answers">
-            <div class="answers-inner answers-four">@AktuelleFrage?.antwort_vier</div>
+            <button class="answers-inner answers-four @GetCssClass(AktuelleFrage?.antwort_vier)"
+        @onclick="() => AntwortAuswaehlen(AktuelleFrage?.antwort_vier)">
+    @AktuelleFrage?.antwort_vier
+</button>
           </div>  
         </div>
       </div>
@@ -63,6 +74,8 @@ else
     public List<QuizFrage> FragenListe { get; set; } = new();
     public int QuestCounter = 0;
     public bool IstGeladen { get; set; } = false;
+    public string? GeklickteAntwort { get; set; } = null;
+
 
     private async Task LadeThemenDatenAsync(string gebiet)
     {
@@ -179,4 +192,29 @@ else
         public string antwort_vier { get; set; } = "";
         public string richtige_antwort { get; set; } = "";
     }
+
+    void AntwortAuswaehlen(string? antwort)
+{
+    GeklickteAntwort = antwort; 
+    Console.WriteLine(GetCssClass(antwort));
+
+    StateHasChanged();     
+}
+
+string GetCssClass(string? antwort)
+{
+    if (GeklickteAntwort == null || antwort == null)
+        return "";
+
+    if (antwort == AktuelleFrage?.richtige_antwort)
+        return "button-correct";
+
+    if (antwort == GeklickteAntwort)
+        return "button-wrong";
+
+    return "";
+}
+
+
+
 }
