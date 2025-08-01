@@ -1,0 +1,8 @@
+.score-container{
+    color: orange;
+    border-radius: 1rem;
+    width: 10rem;
+    height: 4rem;        
+    border-width: 0.5rem;
+    position: relative;    
+}

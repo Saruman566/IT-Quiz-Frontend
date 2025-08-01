@@ -104,6 +104,7 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: row;
     width: 100%;
-    
+    margin-left: 37rem;
 }

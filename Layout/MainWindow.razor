@@ -80,7 +80,6 @@ else
     public bool IstGeladen { get; set; } = false;
     public string? GeklickteAntwort { get; set; } = null;
 
-
     private async Task LadeThemenDatenAsync(string gebiet)
     {
         IstGeladen = false;
@@ -199,28 +198,29 @@ else
         public string richtige_antwort { get; set; } = "";
     }
 
-    void AntwortAuswaehlen(string? antwort)
-{
-    if (antwort == null) return;
+    public void AntwortAuswaehlen(string? antwort)
+        {
+            if (antwort == null) return;
 
-    GeklickteAntwort = antwort;
-    StateHasChanged();
-}
+            GeklickteAntwort = antwort;
+            StateHasChanged();
+        }
 
-string GetCssClass(string? antwort)
-{
-    if (GeklickteAntwort == null || antwort == null)
+    public string GetCssClass(string? antwort)
+    {
+        if (GeklickteAntwort == null || antwort == null)
+            return "";
+
+        if (antwort == AktuelleFrage?.richtige_antwort)
+            
+            return "button-correct";
+
+        if (antwort != AktuelleFrage?.richtige_antwort)
+            return "button-wrong";
+
         return "";
+    }
 
-    if (antwort == AktuelleFrage?.richtige_antwort)
-        return "button-correct";
-
-    if (antwort != AktuelleFrage?.richtige_antwort)
-        return "button-wrong";
-
-    return "";
-}
-
-
+    
 
 }
