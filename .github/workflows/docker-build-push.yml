@@ -22,7 +22,7 @@ jobs:
         run: dotnet restore
 
       - name: Publish
-        run: dotnet publish ./ITQuizFrontend/ITQuizFrontend.csproj -c Release -o publish
+        run: dotnet publish ./ITQuizFrontend.csproj -c Release -o publish
 
       - name: List published files
         run: ls -la publish/wwwroot
