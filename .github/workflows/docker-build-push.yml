@@ -24,6 +24,9 @@ jobs:
       - name: Publish
         run: dotnet publish -c Release -o publish
 
+      - name: List published files
+        run: ls -la publish/wwwroot
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
