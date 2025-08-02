@@ -16,7 +16,7 @@ services:
     platform: linux/amd64
     container_name: itquiz_frontend_1.0
     ports:
-      - "3001:80"
+      - "3002:80"
     networks:
       - itquiz-network
 
