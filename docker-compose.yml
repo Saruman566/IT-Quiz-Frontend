@@ -10,6 +10,9 @@ services:
       - "5154:5154"
     networks:
       - itquiz-network
+    environment:
+    - ConnectionStrings__DefaultConnection=server=host.docker.internal;port=3306;database=itquiz;user=root;pwd=1234;
+
 
   itquizfrontend:
     image: mithrandier38/monitorsharing:itquizfrontend
