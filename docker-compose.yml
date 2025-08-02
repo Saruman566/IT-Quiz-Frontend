@@ -12,9 +12,7 @@ services:
       - itquiz-network
 
   itquizfrontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: mithrandier38/monitorsharing:itquizfrontend
     platform: linux/amd64
     container_name: itquiz_frontend_1.0
     ports:
